@@ -1,10 +1,18 @@
 #include "raylib.h"
 
+struct AnimData
+{
+    Rectangle rect;
+    Vector2 pos;
+    int frame;
+    float updateTime;
+    float runningTime;
+};
+
 int main()
 {
-    const int windowWidth {512};
-    const int windowHeight {380};
-    InitWindow(windowWidth,windowHeight,"Dapper dasher");
+    const int windowDimensions[2] {512, 380};
+    InitWindow(windowDimensions[0],windowDimensions[1],"Dapper dasher");
 
     // nebula variables
     Texture2D nebula {LoadTexture("textures/12_nebula_spritesheet.png")};
@@ -15,30 +23,35 @@ int main()
         nebula.width/8,
         nebula.height/8
     };
-    Vector2 nebulaPos {windowWidth, windowHeight - nebulaRec.height};
+    Vector2 nebulaPos {windowDimensions[0], windowDimensions[1] - nebulaRec.height};
+    int nebFram{0};
+    const float nebUpdateTimer{1.0/12.0};
+    float nebRunningTime{0};
     
     // velocity in pixels/s
-    int nebulaVelocity {-600};
+    int nebulaVelocity {-200};
 
-    // tecture for character setup
+    // Setup for scarfy
     Texture2D scarfy {LoadTexture("textures/scarfy.png")};
-    Rectangle scarfyRec
+    AnimData scarfyData
     {
-        0.0,
-        0.0,
-        scarfy.width/6,
-        scarfy.height
-    };
-    Vector2 scarfyPos {windowWidth/2 - scarfyRec.width/2, windowHeight - scarfyRec.height};
+        Rectangle
+        {
+            0.0,
+            0.0,
+            scarfy.width/6,
+            scarfy.height
+        }
 
-    // animation frame
-    int frame {0};
-    const float updateTime{1.0 / 12.0};
-    float runningTime{0};
+    };
+    scarfyData.pos = { windowDimensions[0]/2 - scarfyData.rect.width/2, windowDimensions[1] - scarfyData.rect.height };
+    scarfyData.frame = 0;
+    scarfyData.updateTime = 1.0/12.0;
+    scarfyData.runningTime = 0;
 
     int velocity {0};
     const int jumpVelocity {-600};
-    bool isInAir {!(scarfyPos.y >= windowHeight - scarfyRec.height)};
+    bool isInAir {!(scarfyData.pos.y >= windowDimensions[1] - scarfyData.rect.height)};
 
     // accelaration (pixels/frame/s)
     const int gravity {1'000};
@@ -56,7 +69,7 @@ int main()
 
         
         // ground check
-        if (scarfyPos.y >= windowHeight - scarfyRec.height)
+        if (scarfyData.pos.y >= windowDimensions[1] - scarfyData.rect.height)
         {
             velocity = 0;
             isInAir = false;
@@ -78,21 +91,34 @@ int main()
         nebulaPos.x += nebulaVelocity * deltaTime;
 
         // update scarface texture position
-        scarfyPos.y += velocity * deltaTime;
+        scarfyData.pos.y += velocity * deltaTime;
 
         // update animation frame
         if (!isInAir)
         {
-            runningTime += deltaTime;
-            if (runningTime >= updateTime)
+            scarfyData.runningTime += deltaTime;
+            if (scarfyData.runningTime >= scarfyData.updateTime)
             {
-                runningTime = 0.0;
-                scarfyRec.x = frame * scarfyRec.width;
-                frame++;
-                if (frame > 5)
+                scarfyData.runningTime = 0.0;
+                scarfyData.rect.x = scarfyData.frame * scarfyData.rect.width;
+                scarfyData.frame++;
+                if (scarfyData.frame > 5)
                 {
-                    frame = 0;
+                    scarfyData.frame = 0;
                 }
+            }
+        }
+
+        // update nebula
+        nebRunningTime += deltaTime;
+        if (nebRunningTime >= nebUpdateTimer)
+        {
+            nebRunningTime = 0.0;
+            nebulaRec.x = nebFram * nebulaRec.width;
+            nebFram++;
+            if (nebFram > 7)
+            {
+                nebFram = 0;
             }
         }
         
@@ -101,7 +127,7 @@ int main()
         DrawTextureRec(nebula, nebulaRec, nebulaPos, WHITE);
         
         // draw scarfy
-        DrawTextureRec(scarfy, scarfyRec, scarfyPos, WHITE);
+        DrawTextureRec(scarfy, scarfyData.rect, scarfyData.pos, WHITE);
 
         EndDrawing();
     }
