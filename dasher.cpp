@@ -15,18 +15,28 @@ int main()
     InitWindow(windowDimensions[0],windowDimensions[1],"Dapper dasher");
 
     // nebula variables
-    Texture2D nebula {LoadTexture("textures/12_nebula_spritesheet.png")};
-    Rectangle nebulaRec
-    {
-        0.0,
-        0.0,
-        nebula.width/8,
-        nebula.height/8
+    Texture2D nebulaTexture {LoadTexture("textures/12_nebula_spritesheet.png")};
+    AnimData neb1;
+    neb1.pos = {
+        (float)windowDimensions[0],
+        windowDimensions[1] - nebulaTexture.height/8.0f
     };
-    Vector2 nebulaPos {windowDimensions[0], windowDimensions[1] - nebulaRec.height};
-    int nebFram{0};
-    const float nebUpdateTimer{1.0/12.0};
-    float nebRunningTime{0};
+
+    AnimData neb2;
+    neb2.pos = {
+        windowDimensions[0] + 300.0f,
+        windowDimensions[1] - nebulaTexture.height/8.0f
+    };
+
+    AnimData nebulas[2] { neb1, neb2 };
+
+    for (int newNebIndex = 0; newNebIndex < 2; newNebIndex++)
+    {
+        nebulas[newNebIndex].rect = {0.0, 0.0, nebulaTexture.width/8.0f, nebulaTexture.height/8.0f};
+        nebulas[newNebIndex].frame = 0;
+        nebulas[newNebIndex].updateTime = 1.0/12.0;
+        nebulas[newNebIndex].runningTime = 0;
+    }
     
     // velocity in pixels/s
     int nebulaVelocity {-200};
@@ -87,8 +97,25 @@ int main()
             velocity += jumpVelocity;
         }
 
-        // update nebula texture position
-        nebulaPos.x += nebulaVelocity * deltaTime;
+        for (int nebulaIndex = 0; nebulaIndex < 2; nebulaIndex++)
+        {
+            nebulas[nebulaIndex].pos.x += nebulaVelocity * deltaTime;
+
+            // update nebula
+            nebulas[nebulaIndex].runningTime += deltaTime;
+            if (nebulas[nebulaIndex].runningTime >= nebulas[nebulaIndex].updateTime)
+            {
+                nebulas[nebulaIndex].runningTime = 0.0;
+                nebulas[nebulaIndex].rect.x = nebulas[nebulaIndex].frame * nebulas[nebulaIndex].rect.width;
+                nebulas[nebulaIndex].frame++;
+                if (nebulas[nebulaIndex].frame > 7)
+                {
+                    nebulas[nebulaIndex].frame = 0;
+                }
+            }
+            // draw nebula
+            DrawTextureRec(nebulaTexture, nebulas[nebulaIndex].rect, nebulas[nebulaIndex].pos, WHITE);
+        }
 
         // update scarface texture position
         scarfyData.pos.y += velocity * deltaTime;
@@ -108,23 +135,9 @@ int main()
                 }
             }
         }
-
-        // update nebula
-        nebRunningTime += deltaTime;
-        if (nebRunningTime >= nebUpdateTimer)
-        {
-            nebRunningTime = 0.0;
-            nebulaRec.x = nebFram * nebulaRec.width;
-            nebFram++;
-            if (nebFram > 7)
-            {
-                nebFram = 0;
-            }
-        }
         
         
-        // draw nebula
-        DrawTextureRec(nebula, nebulaRec, nebulaPos, WHITE);
+        
         
         // draw scarfy
         DrawTextureRec(scarfy, scarfyData.rect, scarfyData.pos, WHITE);
@@ -132,6 +145,6 @@ int main()
         EndDrawing();
     }
     UnloadTexture(scarfy);
-    UnloadTexture(nebula);
+    UnloadTexture(nebulaTexture);
     CloseWindow();
 }
