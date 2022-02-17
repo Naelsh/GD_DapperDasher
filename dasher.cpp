@@ -206,7 +206,11 @@ int main()
 
         if (collision)
         {
-            // loose the game
+            DrawText("Game over", windowDimensions[0]/4, windowDimensions[1]/2, 50, RED);
+        }
+        else if (scarfyData.pos.x >= finishLinePosition)
+        {
+            DrawText("You win!", windowDimensions[0]/4, windowDimensions[1]/2, 50, RED);
         }
         else
         {
