@@ -82,6 +82,9 @@ int main()
     // accelaration (pixels/frame/s)
     const int gravity {1'000};
 
+    Texture2D background = LoadTexture("textures/far-buildings.png");
+    float backgroundX {0.0f};
+
     
     SetTargetFPS(60);
     while (!WindowShouldClose())
@@ -90,6 +93,12 @@ int main()
         
         BeginDrawing();
         ClearBackground(WHITE);
+
+        backgroundX -= 20 * deltaTime;
+
+        // draw background
+        Vector2 backgroundPosition {backgroundX, 0.0};
+        DrawTextureEx(background, backgroundPosition, 0.0, 2.0, WHITE);
 
         // game logic
 
@@ -141,5 +150,6 @@ int main()
     }
     UnloadTexture(scarfy);
     UnloadTexture(nebulaTexture);
+    UnloadTexture(background);
     CloseWindow();
 }
