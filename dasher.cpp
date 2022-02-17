@@ -95,10 +95,17 @@ int main()
         ClearBackground(WHITE);
 
         backgroundX -= 20 * deltaTime;
+        if (backgroundX <= -background.width * 2)
+        {
+            backgroundX = 0;
+        }
+        
 
         // draw background
-        Vector2 backgroundPosition {backgroundX, 0.0};
-        DrawTextureEx(background, backgroundPosition, 0.0, 2.0, WHITE);
+        Vector2 background1Position {backgroundX, 0.0};
+        DrawTextureEx(background, background1Position, 0.0, 2.0, WHITE);
+        Vector2 background2Position {backgroundX + background.width * 2, 0.0};
+        DrawTextureEx(background, background2Position, 0.0, 2.0, WHITE);
 
         // game logic
 
