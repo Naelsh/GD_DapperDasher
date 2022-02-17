@@ -41,7 +41,7 @@ int main()
     // nebula variables
     Texture2D nebulaTexture {LoadTexture("textures/12_nebula_spritesheet.png")};
 
-    const int sizeOfNublae{30};
+    const int sizeOfNublae{5};
     AnimData nebulas[sizeOfNublae] {};
 
     for (int newNebIndex = 0; newNebIndex < sizeOfNublae; newNebIndex++)
@@ -53,6 +53,8 @@ int main()
         nebulas[newNebIndex].pos.y = windowDimensions[1] - nebulaTexture.height/8.0f;
         nebulas[newNebIndex].pos.x = windowDimensions[0] + 300 * newNebIndex;
     }
+
+    float finishLinePosition {nebulas[sizeOfNublae - 1].pos.x};
     
     // velocity in pixels/s
     int nebulaVelocity {-200};
@@ -168,6 +170,9 @@ int main()
             // draw nebula
             DrawTextureRec(nebulaTexture, nebulas[nebulaIndex].rect, nebulas[nebulaIndex].pos, WHITE);
         }
+
+        // move finish line
+        finishLinePosition += nebulaVelocity * deltaTime;
 
         // move scarface
         scarfyData.pos.y += velocity * deltaTime;
