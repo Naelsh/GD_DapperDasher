@@ -93,7 +93,8 @@ int main()
     Texture2D foreground = LoadTexture("textures/foreground.png");
     float foregroundX {0.0f};
 
-    
+    bool collision{false};
+
     SetTargetFPS(60);
     while (!WindowShouldClose())
     {
@@ -166,9 +167,6 @@ int main()
 
             // update nebula
             nebulas[nebulaIndex] = updateAnimData(nebulas[nebulaIndex], deltaTime, 7);
-
-            // draw nebula
-            DrawTextureRec(nebulaTexture, nebulas[nebulaIndex].rect, nebulas[nebulaIndex].pos, WHITE);
         }
 
         // move finish line
@@ -182,9 +180,46 @@ int main()
         {
             scarfyData = updateAnimData(scarfyData, deltaTime, 5);
         }
-        
-        // draw scarfy
-        DrawTextureRec(scarfy, scarfyData.rect, scarfyData.pos, WHITE);
+
+        for (AnimData nebula : nebulas)
+        {
+            float nebulaPad {50};
+            Rectangle nebulaRec{
+                nebula.pos.x + nebulaPad,
+                nebula.pos.y + nebulaPad,
+                nebula.rect.width - nebulaPad * 2,
+                nebula.rect.height - nebulaPad * 2
+            };
+
+            Rectangle scarfyRec{
+                scarfyData.pos.x,
+                scarfyData.pos.y,
+                scarfyData.rect.width,
+                scarfyData.rect.height
+            };
+
+            if (CheckCollisionRecs(nebulaRec, scarfyRec))
+            {
+                collision = true;
+            }
+        }
+
+        if (collision)
+        {
+            // loose the game
+        }
+        else
+        {
+            /* code */
+            // draw nebula
+            for (int nebulaIndex = 0; nebulaIndex < sizeOfNublae; nebulaIndex++)
+            {
+                DrawTextureRec(nebulaTexture, nebulas[nebulaIndex].rect, nebulas[nebulaIndex].pos, WHITE);
+            }
+
+            // draw scarfy
+            DrawTextureRec(scarfy, scarfyData.rect, scarfyData.pos, WHITE);
+        }
 
         EndDrawing();
     }
