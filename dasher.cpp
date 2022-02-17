@@ -9,6 +9,30 @@ struct AnimData
     float runningTime;
 };
 
+bool isOnGround(AnimData data, int windowHeight)
+{
+    return data.pos.y >= windowHeight - data.rect.height;
+}
+
+AnimData updateAnimData(AnimData data, float deltaTime, int maxFrame)
+{
+    // update running time
+    data.runningTime += deltaTime;
+    if (data.runningTime >= data.updateTime)
+    {
+        data.runningTime = 0.0;
+
+        // update animation fram
+        data.rect.x = data.frame * data.rect.width;
+        data.frame++;
+        if (data.frame > maxFrame)
+        {
+            data.frame = 0;
+        }
+    }
+    return data;
+}
+
 int main()
 {
     const int windowDimensions[2] {512, 380};
@@ -71,7 +95,7 @@ int main()
 
         
         // ground check
-        if (scarfyData.pos.y >= windowDimensions[1] - scarfyData.rect.height)
+        if (isOnGround(scarfyData, windowDimensions[1]))
         {
             velocity = 0;
             isInAir = false;
@@ -91,45 +115,24 @@ int main()
 
         for (int nebulaIndex = 0; nebulaIndex < sizeOfNublae; nebulaIndex++)
         {
+            // move nebula
             nebulas[nebulaIndex].pos.x += nebulaVelocity * deltaTime;
 
             // update nebula
-            nebulas[nebulaIndex].runningTime += deltaTime;
-            if (nebulas[nebulaIndex].runningTime >= nebulas[nebulaIndex].updateTime)
-            {
-                nebulas[nebulaIndex].runningTime = 0.0;
-                nebulas[nebulaIndex].rect.x = nebulas[nebulaIndex].frame * nebulas[nebulaIndex].rect.width;
-                nebulas[nebulaIndex].frame++;
-                if (nebulas[nebulaIndex].frame > 7)
-                {
-                    nebulas[nebulaIndex].frame = 0;
-                }
-            }
+            nebulas[nebulaIndex] = updateAnimData(nebulas[nebulaIndex], deltaTime, 7);
+
             // draw nebula
             DrawTextureRec(nebulaTexture, nebulas[nebulaIndex].rect, nebulas[nebulaIndex].pos, WHITE);
         }
 
-        // update scarface texture position
+        // move scarface
         scarfyData.pos.y += velocity * deltaTime;
 
         // update animation frame
         if (!isInAir)
         {
-            scarfyData.runningTime += deltaTime;
-            if (scarfyData.runningTime >= scarfyData.updateTime)
-            {
-                scarfyData.runningTime = 0.0;
-                scarfyData.rect.x = scarfyData.frame * scarfyData.rect.width;
-                scarfyData.frame++;
-                if (scarfyData.frame > 5)
-                {
-                    scarfyData.frame = 0;
-                }
-            }
+            scarfyData = updateAnimData(scarfyData, deltaTime, 5);
         }
-        
-        
-        
         
         // draw scarfy
         DrawTextureRec(scarfy, scarfyData.rect, scarfyData.pos, WHITE);
