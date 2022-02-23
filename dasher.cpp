@@ -77,12 +77,12 @@ int main()
     scarfyData.updateTime = 1.0/12.0;
     scarfyData.runningTime = 0;
 
-    int velocity {0};
-    const int jumpVelocity {-600};
+    float velocity {0.f};
+    const float jumpVelocity {-600.f};
     bool isInAir {!(scarfyData.pos.y >= windowDimensions[1] - scarfyData.rect.height)};
 
     // accelaration (pixels/frame/s)
-    const int gravity {1'000};
+    const float gravity {1'000.f};
 
     Texture2D background = LoadTexture("textures/far-buildings.png");
     float backgroundX {0.0f};
